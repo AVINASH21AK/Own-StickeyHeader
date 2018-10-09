@@ -8,12 +8,12 @@
         android:id="@+id/tvHeader"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="#cacaca"
+        android:background="#f95151"
 
         android:textAlignment="gravity"
         android:gravity="center"
         android:textSize="14dp"
         android:text="Header"
-        android:textColor="#f17e7e"/>
+        android:textColor="#ffffff"/>
 
 </RelativeLayout>

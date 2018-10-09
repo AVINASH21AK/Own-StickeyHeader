@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.apidemo.decoration.StickyHeaderAdapter;
+import com.apidemo.decoration.StickyHeaderDecoration;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
@@ -43,12 +45,41 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(MainActivity.this);
         //dbHelper.dropAllTable();
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setNestedScrollingEnabled(false);
+
         dbHelper.dropAllTable();
 
-        callAPI();
+        //callAPI();
+
+        for(int i=0; i<50; i++)
+        {
+            if(i<=10)
+            {
+                arrayArticle.add(new ArticlesModel(String.valueOf(i),"Rachel Kaser",
+                        "Google+ is finally shutting down -- and for dramatic reasons",
+                        "Google today revealed it'd be shutting down the consumer version of Google+ in response to a previously undisclosed security flaw -- and also because no one's really using it. Earlier ...",
+                        "https://img-cdn.tnwcdn.com/image/tnw?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2015%2F03%2Fgoogleplus2-520x261.jpg&signature=dd8d9133d51f469470d39cf986502331",
+                        "2018-10-08T22:08:48Z"));
+            }
+            else if(i>10 && i<=20)
+            {
+                arrayArticle.add(new ArticlesModel(String.valueOf(i),"Rachel Kaser",
+                        "Google+ is finally shutting down -- and for dramatic reasons",
+                        "Google today revealed it'd be shutting down the consumer version of Google+ in response to a previously undisclosed security flaw -- and also because no one's really using it. Earlier ...",
+                        "https://img-cdn.tnwcdn.com/image/tnw?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2015%2F03%2Fgoogleplus2-520x261.jpg&signature=dd8d9133d51f469470d39cf986502331",
+                        "2018-11-08T20:57:15Z"));
+            }
+            else if(i>20 && i<50)
+            {
+                arrayArticle.add(new ArticlesModel(String.valueOf(i),"Rachel Kaser",
+                        "Google+ is finally shutting down -- and for dramatic reasons",
+                        "Google today revealed it'd be shutting down the consumer version of Google+ in response to a previously undisclosed security flaw -- and also because no one's really using it. Earlier ...",
+                        "https://img-cdn.tnwcdn.com/image/tnw?filter_last=1&fit=1280%2C640&url=https%3A%2F%2Fcdn0.tnwcdn.com%2Fwp-content%2Fblogs.dir%2F1%2Ffiles%2F2015%2F03%2Fgoogleplus2-520x261.jpg&signature=dd8d9133d51f469470d39cf986502331",
+                        "2018-12-08T22:08:48Z"));
+            }
+
+
+        }
+        setItemData(arrayArticle);
     }
 
     private void callAPI() {
@@ -120,17 +151,27 @@ public class MainActivity extends AppCompatActivity {
     public void setItemData(ArrayList<ArticlesModel> arrayArticle) {
 
         dataAdapter = new DataAdapter(this, arrayArticle);
-        recyclerView.setAdapter(dataAdapter);
+
 
         // Add the sticky headers decoration
-        final StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(dataAdapter);
-        recyclerView.addItemDecoration(headersDecor);
+        /*final StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(dataAdapter);
+        recyclerView.addItemDecoration(headersDecor);*/
+
+        StickyHeaderDecoration decor = new StickyHeaderDecoration(dataAdapter);
+        decor.clearHeaderCache();
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.addItemDecoration(decor, 0);
+
+        recyclerView.setAdapter(dataAdapter);
 
     }
     
     
 
-    public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> implements StickyRecyclerHeadersAdapter<DataAdapter.HeaderViewHolder>
+    public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> implements StickyHeaderAdapter<DataAdapter.HeaderViewHolder>
     {
         private ArrayList<ArticlesModel> arrayArticle;
         private Context context;
@@ -204,8 +245,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public long getHeaderId(int position) {
-            return position;
+            ArticlesModel articlesModel = arrayArticle.get(position);
+           return App.convertDateToMilliSec(App.parseDateToddMMyyyyNoTime(articlesModel.publishedAt));
         }
+
+
 
         @Override
         public HeaderViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
